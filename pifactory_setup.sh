@@ -5,7 +5,7 @@
 # this script will setup the build environment
 #
 # setup like this
-# sudo apt-get install qemu
+# sudo apt-get install qemu grub2
 #
 # run it like this
 # sudo ./pifactory_setup.sh debian.qcow2 builder jessie
@@ -16,8 +16,11 @@
 # https://gist.github.com/jalsot/a24aa543021889ad0c70
 #
 #
+# current bugs:
+#  * no grub installed
+#  * have to enter a root password at install time
 #
-
+#
 # Configs overwritable via environment variables
 VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
