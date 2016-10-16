@@ -4,6 +4,9 @@
 #
 # this script will setup the build environment
 #
+# setup like this
+# sudo apt-get install qemu
+#
 # run it like this
 # sudo ./pifactory_setup.sh debian.qcow2 builder jessie
 #
@@ -18,7 +21,7 @@
 # Configs overwritable via environment variables
 VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
-INCLUDES=${INCLUDES:="less,vim,sudo,openssh-server,acpid"}
+INCLUDES=${INCLUDES:=""}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
 ARCH=${ARCH:=amd64}
 APT_CACHER=${APT_CACHER:=no}
