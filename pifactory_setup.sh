@@ -11,7 +11,10 @@
 # sudo ./pifactory_setup.sh debian.qcow2 builder jessie
 # sudo chown user:user debian.qcow2
 #
-# qemu-system-x86_64 -drive file=debiannew.qcow2,if=virtio -boot d -m 256
+# with vda drives (DO NOT USE): qemu-system-x86_64 -drive file=debiannew.qcow2,if=virtio -boot d -m 256
+#
+# with sda drives: qemu-system-x86_64 -hda debiannew.qcow2 -boot d -m 256
+#
 #
 # based on code by the following authors:
 # http://diogogomes.com/2012/07/13/debootstrap-kvm-image/
@@ -23,13 +26,14 @@
 #  * grub installed i386? "i386-pc"
 #  * have to enter a root password at install time
 #  * INCLUDES must not be empty
+#  * hostname seems to be builder... Weird
 #
 # Configs overwritable via environment variables
 VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
 INCLUDES=${INCLUDES:="sudo"}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
-ARCH=${ARCH:=686}
+ARCH=${ARCH:=amd64}
 APT_CACHER=${APT_CACHER:=no}
 IMGSIZE=${IMGSIZE:=3G}
 
@@ -88,12 +92,7 @@ if [ ! -f $FILE ]; then
 fi
 
 if [ $FLAVOUR == "debian" ]; then
-    if [ $ARCH == "686" ]; then
-        KERNEL_PKG=linux-image-686-pae
-    else
-        KERNEL_PKG=linux-image-$ARCH
-    fi
-    BOOT_PKG="$KERNEL_PKG grub-pc"
+    BOOT_PKG="linux-image-$ARCH grub-pc"
 fi
 
 echo "Looking for nbd device..."
