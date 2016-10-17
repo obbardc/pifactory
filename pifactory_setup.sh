@@ -18,7 +18,7 @@
 #
 #
 # current bugs:
-#  * grub installed i386?
+#  * grub installed i386? "i386-pc"
 #  * have to enter a root password at install time
 #  * INCLUDES must not be empty
 #
@@ -27,7 +27,7 @@ VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
 INCLUDES=${INCLUDES:="sudo"}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
-ARCH=${ARCH:=amd64}
+ARCH=${ARCH:=i386}
 APT_CACHER=${APT_CACHER:=no}
 IMGSIZE=${IMGSIZE:=3G}
 
@@ -86,9 +86,12 @@ if [ ! -f $FILE ]; then
 fi
 
 if [ $FLAVOUR == "debian" ]; then
+    if [ $ARCH == "i386" ]; then
+        KERNEL_PKG=linux-image-686-pae
+    else
+        KERNEL_PKG=linux-image-$ARCH
+    fi
     BOOT_PKG="linux-image-$ARCH grub-pc"
-elif [ $FLAVOUR == "ubuntu" ]; then
-    BOOT_PKG="linux-image-generic grub-pc"
 fi
 
 echo "Looking for nbd device..."
