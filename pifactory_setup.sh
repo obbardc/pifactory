@@ -11,6 +11,8 @@
 # sudo ./pifactory_setup.sh debian.qcow2 builder jessie
 # sudo chown user:user debian.qcow2
 #
+# qemu-system-x86_64 -drive file=debiannew.qcow2,if=virtio -boot d -m 256
+#
 # based on code by the following authors:
 # http://diogogomes.com/2012/07/13/debootstrap-kvm-image/
 # https://gist.github.com/spectra/10301941
@@ -131,8 +133,8 @@ debootstrap --include=$INCLUDES $* $RELEASE $MNT_DIR $MIRROR || fail "cannot ins
 
 echo "Configuring system..."
 cat <<EOF > $MNT_DIR/etc/fstab
-/dev/vda1 /boot               ext4    sync 0       2
-/dev/vda2 /                   ext4    errors=remount-ro 0       1
+/dev/sda1 /boot               ext4    sync 0       2
+/dev/sda2 /                   ext4    errors=remount-ro 0       1
 EOF
 
 echo $HOSTNAME > $MNT_DIR/etc/hostname
@@ -164,8 +166,8 @@ chroot $MNT_DIR grub-install $DISK || fail "cannot install grub"
 chroot $MNT_DIR update-grub || fail "cannot update grub"
 chroot $MNT_DIR apt-get clean || fail "unable to clean apt cache"
 
-sed -i "s|${DISK}p1|/dev/vda1|g" $MNT_DIR/boot/grub/grub.cfg
-sed -i "s|${DISK}p2|/dev/vda2|g" $MNT_DIR/boot/grub/grub.cfg
+sed -i "s|${DISK}p1|/dev/sda1|g" $MNT_DIR/boot/grub/grub.cfg
+sed -i "s|${DISK}p2|/dev/sda2|g" $MNT_DIR/boot/grub/grub.cfg
 
 echo "Enter root password:"
 while ! chroot $MNT_DIR passwd root
