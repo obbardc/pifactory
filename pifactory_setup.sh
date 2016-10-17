@@ -91,7 +91,7 @@ if [ $FLAVOUR == "debian" ]; then
     else
         KERNEL_PKG=linux-image-$ARCH
     fi
-    BOOT_PKG="linux-image-$ARCH grub-pc"
+    BOOT_PKG="$KERNEL_PKG grub-pc"
 fi
 
 echo "Looking for nbd device..."
