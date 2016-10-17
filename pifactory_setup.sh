@@ -9,6 +9,7 @@
 #
 # run it like this
 # sudo ./pifactory_setup.sh debian.qcow2 builder jessie
+# sudo chown user:user debian.qcow2
 #
 # based on code by the following authors:
 # http://diogogomes.com/2012/07/13/debootstrap-kvm-image/
@@ -17,7 +18,7 @@
 #
 #
 # current bugs:
-#  * no grub installed
+#  * grub installed i386?
 #  * have to enter a root password at install time
 #
 #
