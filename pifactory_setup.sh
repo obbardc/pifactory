@@ -20,12 +20,12 @@
 # current bugs:
 #  * grub installed i386?
 #  * have to enter a root password at install time
-#
+#  * INCLUDES must not be empty
 #
 # Configs overwritable via environment variables
 VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
-INCLUDES=${INCLUDES:=""}                    # enter packages here in CSV format
+INCLUDES=${INCLUDES:="sudo"}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
 ARCH=${ARCH:=amd64}
 APT_CACHER=${APT_CACHER:=no}
