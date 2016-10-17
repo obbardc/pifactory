@@ -27,7 +27,7 @@ VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
 INCLUDES=${INCLUDES:="sudo"}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
-ARCH=${ARCH:=i386}
+ARCH=${ARCH:=686}
 APT_CACHER=${APT_CACHER:=no}
 IMGSIZE=${IMGSIZE:=3G}
 
@@ -86,7 +86,7 @@ if [ ! -f $FILE ]; then
 fi
 
 if [ $FLAVOUR == "debian" ]; then
-    if [ $ARCH == "i386" ]; then
+    if [ $ARCH == "686" ]; then
         KERNEL_PKG=linux-image-686-pae
     else
         KERNEL_PKG=linux-image-$ARCH
