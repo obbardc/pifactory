@@ -1,0 +1,19 @@
+#!/usr/bin/python
+
+# requires python-paramiko
+import paramiko.client
+
+client = paramiko.client.SSHClient()
+
+# auto accept the host key to this session (warning: security f*ck up)
+client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
+
+# connect to the QEMU server
+client.connect(hostname='127.0.0.1', port=8162, username='root', password='pass', look_for_keys=False)
+
+# run a command
+stdin, stdout, stderr = client.exec_command('ls -la /')
+
+# print the command output
+for line in stdout.readlines():
+    print "line: " + line

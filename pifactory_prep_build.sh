@@ -6,7 +6,3 @@
 
 apt-get update
 apt-get upgrade -y
-
-# install SSH server
-#apt-get install openssh-server -y
-# nope we do not do this anymore
