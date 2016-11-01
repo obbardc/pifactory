@@ -23,19 +23,16 @@
 #
 #
 # current bugs:
-#  * grub installed i386? "i386-pc"
-#  * have to enter a root password at install time
 #  * INCLUDES must not be empty
-#  * hostname seems to be builder... Weird
 #
 # Configs overwritable via environment variables
 VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
-INCLUDES=${INCLUDES:="sudo"}                    # enter packages here in CSV format
+INCLUDES=${INCLUDES:="dropbear"}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
 ARCH=${ARCH:=amd64}
 APT_CACHER=${APT_CACHER:=no}
-IMGSIZE=${IMGSIZE:=3G}
+IMGSIZE=${IMGSIZE:=16G}
 
 clean_debian() {
 	[ "$MNT_DIR" != "" ] && chroot $MNT_DIR umount /proc/ /sys/ /dev/ /boot/
@@ -168,11 +165,14 @@ chroot $MNT_DIR apt-get clean || fail "unable to clean apt cache"
 sed -i "s|${DISK}p1|/dev/sda1|g" $MNT_DIR/boot/grub/grub.cfg
 sed -i "s|${DISK}p2|/dev/sda2|g" $MNT_DIR/boot/grub/grub.cfg
 
-echo "Enter root password:"
-while ! chroot $MNT_DIR passwd root
-do
-	echo "Try again"
-done
+#echo "Enter root password:"
+#while ! chroot $MNT_DIR passwd root
+#do
+#	echo "Try again"
+#done
+
+# set root password to root
+echo "rootme" | chroot $MNT_DIR passwd root --stdin
 
 echo "Finishing grub installation..."
 grub-install $DISK --root-directory=$MNT_DIR --modules="biosdisk part_msdos" || fail "cannot reinstall grub"
