@@ -32,7 +32,7 @@ INCLUDES=${INCLUDES:="dropbear"}                    # enter packages here in CSV
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
 ARCH=${ARCH:=amd64}
 APT_CACHER=${APT_CACHER:=no}
-IMGSIZE=${IMGSIZE:=16G}
+IMGSIZE=${IMGSIZE:=16G}             # base system takes approx. 600mb
 
 clean_debian() {
 	[ "$MNT_DIR" != "" ] && chroot $MNT_DIR umount /proc/ /sys/ /dev/ /boot/
@@ -171,8 +171,8 @@ sed -i "s|${DISK}p2|/dev/sda2|g" $MNT_DIR/boot/grub/grub.cfg
 #	echo "Try again"
 #done
 
-# set root password to root
-echo "rootme" | chroot $MNT_DIR passwd root --stdin
+# set root password to pass
+echo "root:pass" | chroot $MNT_DIR chpasswd
 
 echo "Finishing grub installation..."
 grub-install $DISK --root-directory=$MNT_DIR --modules="biosdisk part_msdos" || fail "cannot reinstall grub"
