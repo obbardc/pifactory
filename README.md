@@ -27,8 +27,8 @@ Build your image (TBC):
 
 
 todo list:
- > Get a list of required packages
- > Debianize as part of PDK source package
- > guest reboots after grub starts
- > debootstrap option "--variant=minbase" when making images ?
- > pifactory_setup makes my computer freak out afterwards :-(
+* Get a list of required packages
+* Debianize as part of PDK source package
+* guest reboots after grub starts, although this is not too much of a problem
+* debootstrap option "--variant=minbase" when making base images?
+* pifactory_setup makes my computer freak out afterwards :-(
