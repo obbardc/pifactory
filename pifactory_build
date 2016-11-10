@@ -5,59 +5,96 @@
 #
 # requires python-paramiko
 
-# Make a copy of the base image
+# Our "clever" functions start here
+
 image_baseimage = "debian-jessie-baseimage.qcow2"
 image_tempimage = "temp.qcow2"
 
-import os, shutil
+# Make a copy of the base image
+def copy_base_image():
+    import os, shutil
 
-# check the base image exists
-if not os.path.exists(image_baseimage):
-    print("cannot find base image " + image_baseimage)
-    exit(0)
+    # check the base image exists
+    if not os.path.exists(image_baseimage):
+        print("ERROR: cannot find base image " + image_baseimage)
+        exit(0)
 
-# delete the temp file if it exists
-if os.path.exists(image_tempimage):
-    os.remove(image_tempimage)
+    # delete the temp file if it exists
+    if os.path.exists(image_tempimage):
+        os.remove(image_tempimage)
 
-# copy the base image to a temp image
-shutil.copyfile(image_baseimage, image_tempimage)
+    # copy the base image to a temp image
+    shutil.copyfile(image_baseimage, image_tempimage)
 
 
 # Start the qemu session
-import shlex, subprocess
+def start_builder_vm():
+    import shlex, subprocess
 
-# qemu-system-x86_64 -hda debian-jessie-baseimage.qcow2 -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic
-command_line = "qemu-system-x86_64 -hda " + image_tempimage + " -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic"
-args = shlex.split(command_line)
-print(args)
+    # qemu-system-x86_64 -hda debian-jessie-baseimage.qcow2 -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic
+    command_line = "qemu-system-x86_64 -hda " + image_tempimage + " -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic"
+    args = shlex.split(command_line)
 
-proc = subprocess.Popen(args)
+    proc = subprocess.Popen(args)
 
-print("ELLO MATE")
 
-# we need to sleep for 20s to allow the VM to boot. the ssh port does not need to be open
-import time
-time.sleep(200)
+# Wait for the vm to be ready, or quit if it takes too long to start
+def wait_builder_vm():
+    import time
+    
+    client = connect_vm_ssh()
+    while client == None:
+        time.sleep(20)
+        client = connect_vm_ssh()
 
-print("trying")
+    client.close()
 
 
 # Communicate with the VM over SSH
+def connect_vm_ssh():
+    import paramiko.client
+    import paramiko.util
+    
+    # send all error messages to HELL
+    paramiko.util.log_to_file("/dev/null")
 
-import paramiko.client
+    client = paramiko.client.SSHClient()
 
-client = paramiko.client.SSHClient()
+    # auto accept the host key to this session (warning: security f*ck up)
+    client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
 
-# auto accept the host key to this session (warning: security f*ck up)
-client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
+    try:
+        client.connect(hostname='127.0.0.1', port=8162, username='root', password='pass', timeout=1, look_for_keys=False)
+    except Exception, e:
+        return None
+    
+    return client
 
-# connect to the QEMU server
-client.connect(hostname='127.0.0.1', port=8162, username='root', password='pass', look_for_keys=False)
 
-# run a command
-stdin, stdout, stderr = client.exec_command('ls -la /')
+def do_the_thing():
+    client = connect_vm_ssh()
+    
+    if client == None:
+        print("Error!")
+        exit(0)
 
-# print the command output
-for line in stdout.readlines():
-    print "line: " + line
+    # run a command
+    stdin, stdout, stderr = client.exec_command("ls -la /")
+    for line in stdout.readlines():
+        print("ls line: " + line)
+    
+    print("got here")
+    
+    # shutdown the client.
+    stdin, stdout, stderr = client.exec_command("/sbin/shutdown now")
+    for line in stderr.readlines():
+        print("stdout line: " + line)
+        
+    # finish up
+    client.close()
+
+
+#copy_base_image() # we don't need to do this for testing, takes too long
+start_builder_vm()
+wait_builder_vm()
+do_the_thing()
