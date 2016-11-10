@@ -44,7 +44,7 @@ def wait_builder_vm():
     
     client = connect_vm_ssh()
     while client == None:
-        time.sleep(20)
+        time.sleep(5)
         client = connect_vm_ssh()
 
     client.close()
@@ -70,25 +70,42 @@ def connect_vm_ssh():
     
     return client
 
+def copy_script():
+    client = connect_vm_ssh()
+    
+    if client == None:
+        print("Error connecting over SSH!")
+        exit(0)
+    
+    # copy the script
+    sftp = client.open_sftp()
+    sftp.put("test.sh", "/root/test.sh")
+    sftp.close()
+    
+    client.close()
 
 def do_the_thing():
     client = connect_vm_ssh()
     
     if client == None:
-        print("Error!")
+        print("Error connecting over SSH!")
         exit(0)
 
     # run a command
-    stdin, stdout, stderr = client.exec_command("ls -la /")
+    #stdin, stdout, stderr = client.exec_command("ls -la /root")
+    stdin, stdout, stderr = client.exec_command("cat /root/test.sh")
     for line in stdout.readlines():
-        print("ls line: " + line)
+        print("cat line: " + line)
+        
+    client.exec_command("chmod +x /root/test.sh")
     
-    print("got here")
+    # run our script we lovingly copied earlier
+    stdin, stdout, stderr = client.exec_command("/root/test.sh")
+    for line in stdout.readlines():
+        print("SCRIPT line: " + line)
     
     # shutdown the client.
-    stdin, stdout, stderr = client.exec_command("/sbin/shutdown now")
-    for line in stderr.readlines():
-        print("stdout line: " + line)
+    client.exec_command("/sbin/shutdown now")
         
     # finish up
     client.close()
@@ -97,4 +114,5 @@ def do_the_thing():
 #copy_base_image() # we don't need to do this for testing, takes too long
 start_builder_vm()
 wait_builder_vm()
+copy_script()
 do_the_thing()

@@ -28,7 +28,8 @@
 # Configs overwritable via environment variables
 VSYSTEM=${VSYSTEM:=qemu}					# Either 'qemu' or 'kvm'
 FLAVOUR=${FLAVOUR:=debian}					# Either 'debian' or 'ubuntu'
-INCLUDES=${INCLUDES:="dropbear"}                    # enter packages here in CSV format
+#INCLUDES=${INCLUDES:="dropbear"}                    # enter packages here in CSV format   # dropbair has no sftp server :-(
+INCLUDES=${INCLUDES:="openssh-server"}                    # enter packages here in CSV format
 MIRROR=${MIRROR:="http://ftp.uk.debian.org/debian"}
 ARCH=${ARCH:=amd64}
 APT_CACHER=${APT_CACHER:=no}
@@ -161,6 +162,7 @@ LANG=C DEBIAN_FRONTEND=noninteractive chroot $MNT_DIR apt-get install -y --force
 chroot $MNT_DIR grub-install $DISK || fail "cannot install grub"
 chroot $MNT_DIR update-grub || fail "cannot update grub"
 chroot $MNT_DIR apt-get clean || fail "unable to clean apt cache"
+chroot $MNT_DIR sed -i 's/^PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 sed -i "s|${DISK}p1|/dev/sda1|g" $MNT_DIR/boot/grub/grub.cfg
 sed -i "s|${DISK}p2|/dev/sda2|g" $MNT_DIR/boot/grub/grub.cfg
