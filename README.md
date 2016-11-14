@@ -32,3 +32,4 @@ todo list:
 * guest reboots after grub starts, although this is not too much of a problem
 * debootstrap option "--variant=minbase" when making base images?
 * pifactory_setup makes my computer freak out afterwards :-(
+* wait to shutdown cleanly before killing !

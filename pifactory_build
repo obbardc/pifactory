@@ -26,6 +26,11 @@ def copy_base_image():
     # copy the base image to a temp image
     shutil.copyfile(image_baseimage, image_tempimage)
 
+def remove_temp_image():
+    import os
+    
+    if os.path.exists(image_tempimage):
+        os.remove(image_tempimage)
 
 # Start the qemu session
 def start_builder_vm():
@@ -79,7 +84,7 @@ def copy_script():
     
     # copy the script
     sftp = client.open_sftp()
-    sftp.put("test.sh", "/root/test.sh")
+    sftp.put("pifactory", "/root/pifactory")
     sftp.close()
     
     client.close()
@@ -93,26 +98,28 @@ def do_the_thing():
 
     # run a command
     #stdin, stdout, stderr = client.exec_command("ls -la /root")
-    stdin, stdout, stderr = client.exec_command("cat /root/test.sh")
-    for line in stdout.readlines():
-        print("cat line: " + line)
+    #for line in stdout.readlines():
+    #    print("cat line: " + line)
         
-    client.exec_command("chmod +x /root/test.sh")
+    client.exec_command("chmod +x /root/pifactory")
     
     # run our script we lovingly copied earlier
-    stdin, stdout, stderr = client.exec_command("/root/test.sh")
+    stdin, stdout, stderr = client.exec_command("/root/pifactory")
     for line in stdout.readlines():
         print("SCRIPT line: " + line)
     
     # shutdown the client.
     client.exec_command("/sbin/shutdown now")
-        
+
+    # todo: wait to shutdown cleanly before killing !
+
     # finish up
     client.close()
 
 
-#copy_base_image() # we don't need to do this for testing, takes too long
+copy_base_image() # we don't need to do this for testing, takes too long
 start_builder_vm()
 wait_builder_vm()
 copy_script()
 do_the_thing()
+remove_temp_image()
