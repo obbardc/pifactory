@@ -54,17 +54,28 @@ def wait_builder_vm():
         time.sleep(5)
 
 def do_the_thing():
+
+    client.exec_command("~/.profile; ~/.bash_profile")
+
     # install some things
     client.exec_command("/usr/bin/apt-get --yes update")
     client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes upgrade")
     stdout, stderr, retcode = client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes install debootstrap kpartx dosfstools qemu-user-static")
+
+
+    print("OUT")
+    print(stdout)
+    print("ERR")
+    print(stderr)
+    print("RETCODE")
+    print(retcode)
 
     # copy the script
     client.copy_file_sftp("pifactory", "/root/pifactory")
     client.exec_command("chmod +x /root/pifactory")
 
     # start the script
-    #stdout, stderr, retcode = client.exec_command("/root/pifactory")
+    stdout, stderr, retcode = client.exec_command("/root/pifactory")
 
     print("OUT")
     print(stdout)
