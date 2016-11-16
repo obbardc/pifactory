@@ -19,6 +19,8 @@ Block access to the VM port (8162) from the outside world:
 sudo iptables -A INPUT -p tcp --destination-port 8162 -j DROP
 ```
 
+Place your Apt repo created with PDK inside a zip file called "distro_master.apt.zip"
+
 
 Build your image (TBC):
 ```

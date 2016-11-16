@@ -10,10 +10,14 @@
 image_baseimage = "debian-jessie-baseimage.qcow2"
 image_tempimage = "temp.qcow2"
 
+def debug(message):
+    print("[DEBUG] " + message)
+
 # Make a copy of the base image
 def copy_base_image():
     import os, shutil
 
+    debug("Copying base image")
     # check the base image exists
     if not os.path.exists(image_baseimage):
         print("ERROR: cannot find base image " + image_baseimage)
@@ -25,10 +29,13 @@ def copy_base_image():
 
     # copy the base image to a temp image
     shutil.copyfile(image_baseimage, image_tempimage)
+    
+    debug("Copied base image!")
 
 def remove_temp_image():
     import os
 
+    debug("Removing temp image")
     if os.path.exists(image_tempimage):
         os.remove(image_tempimage)
 
@@ -58,26 +65,31 @@ def do_the_thing():
     client.exec_command("~/.profile; ~/.bash_profile")
 
     # install some things
+    debug("Updating the VM software")
     client.exec_command("/usr/bin/apt-get --yes update")
-    client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes upgrade")
+    #client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes upgrade")
     stdout, stderr, retcode = client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes install debootstrap kpartx dosfstools qemu-user-static")
 
 
-    print("OUT")
-    print(stdout)
-    print("ERR")
-    print(stderr)
-    print("RETCODE")
-    print(retcode)
-
     # copy the script
+    debug("Copying script into VM")
     client.copy_file_sftp("pifactory", "/root/pifactory")
     client.exec_command("chmod +x /root/pifactory")
 
-    # start the script
-    stdout, stderr, retcode = client.exec_command("/root/pifactory")
+    # copy apt & unzip
+    debug("Copying APT repo into VM")
+    client.copy_file_sftp("distro_master.apt.zip", "/root/distro_master.apt.zip")
+    client.exec_command("mkdir /root/apt")
+    debug("Unzipping APT repo")
+    client.exec_command("unzip /root/distro_master.apt.zip -d /root/apt")
+    client.exec_command("rm /root/distro_master.apt.zip")
 
-    print("OUT")
+    # start the script
+    client.exec_command("cd /root")
+    debug("Starting script")
+    stdout, stderr, retcode = client.exec_command("/root/pifactory test jessie out.img apt/")
+
+    debug("Done script!")
     print(stdout)
     print("ERR")
     print(stderr)
@@ -92,9 +104,8 @@ def do_the_thing():
     # finish up
     client.close()
 
-
-#copy_base_image() # we don't need to do this for testing, takes too long
+copy_base_image() # we don't need to do this for testing, takes too long
 start_builder_vm()
 wait_builder_vm()
 do_the_thing()
-#remove_temp_image()
+remove_temp_image()
