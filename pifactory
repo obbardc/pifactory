@@ -54,7 +54,7 @@ echo "PI-BUILDER: Image $image created and mounted as $device"
 
 # Format the image file partitions
 echo "PI-BUILDER: Setting up MBR/Partitions"
-fdisk $device << EOF
+fdisk $device &>/dev/null << EOF
 n
 p
 1

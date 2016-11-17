@@ -68,6 +68,7 @@ def do_the_thing():
     debug("Updating the VM software")
     client.exec_command("/usr/bin/apt-get --yes update")
     #client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes upgrade")
+    #binfmt-support qemu qemu-user-static debootstrap kpartx lvm2 dosfstools
     stdout, stderr, retcode = client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes install debootstrap kpartx dosfstools qemu-user-static")
 
 
