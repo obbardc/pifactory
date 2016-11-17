@@ -43,7 +43,7 @@ def remove_temp_image():
 def start_builder_vm():
     import shlex, subprocess
 
-    # qemu-system-x86_64 -hda debian-jessie-baseimage.qcow2 -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic
+    # qemu-system-x86_64 -hda test.qcow2 -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic
     command_line = "qemu-system-x86_64 -hda " + image_tempimage + " -boot d -m 256 -net user,hostfwd=tcp::8162-:22 -net nic"
     args = shlex.split(command_line)
 
@@ -68,8 +68,8 @@ def do_the_thing():
     debug("Updating the VM software")
     client.exec_command("/usr/bin/apt-get --yes update")
     #client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes upgrade")
-    #binfmt-support qemu qemu-user-static debootstrap kpartx lvm2 dosfstools
-    stdout, stderr, retcode = client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes install debootstrap kpartx dosfstools qemu-user-static")
+    #qemu    binfmt-support isnt needed?
+    client.exec_command("DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get --yes install unzip debootstrap kpartx dosfstools qemu-user-static lvm2 e2fsprogs binfmt-support")
 
 
     # copy the script
@@ -80,7 +80,6 @@ def do_the_thing():
     # copy apt & unzip
     debug("Copying APT repo into VM")
     client.copy_file_sftp("distro_master.apt.zip", "/root/distro_master.apt.zip")
-    client.exec_command("mkdir /root/apt")
     debug("Unzipping APT repo")
     client.exec_command("unzip /root/distro_master.apt.zip -d /root/apt")
     client.exec_command("rm /root/distro_master.apt.zip")
